@@ -7,7 +7,13 @@
   "type": "module",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsx --project tsconfig.json",
+    "dev": "tsx watch src/index",
+    "start": "node dist/index.js",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "test": "echo \"No test written yet\"",
+    "format": "prettier --check \"src/**/*.ts\""
   },
   "keywords": [],
   "author": "",
@@ -16,5 +22,8 @@
     "@chatapp/common": "workspace:^",
     "dotenv": "^17.4.2",
     "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
   }
 }
