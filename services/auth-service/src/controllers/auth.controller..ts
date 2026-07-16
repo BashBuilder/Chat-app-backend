@@ -1,0 +1,11 @@
+import { RegisterInput } from '@/__types__/auth';
+import { register } from '@/services/auth.service';
+import { asyncHandler } from '@chatapp/common';
+import { RequestHandler } from 'express';
+
+export const registerHandler: RequestHandler = asyncHandler(async (req, res) => {
+  const payload = req.body as RegisterInput;
+  const tokens = await register(payload);
+
+  res.status(201).json(tokens);
+});

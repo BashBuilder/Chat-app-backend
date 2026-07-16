@@ -1,7 +1,8 @@
-import express, { type Application } from "express";
-import helmet from "helmet";
-import cors from "cors";
-import { errorHandler } from "@/middlewares/error-handler";
+import express, { type Application } from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import { errorHandler } from '@/middlewares/error-handler';
+import { registerRoutes } from './routes/indext';
 
 export const createApp = (): Application => {
   const app = express();
@@ -9,7 +10,7 @@ export const createApp = (): Application => {
   app.use(helmet());
   app.use(
     cors({
-      origin: "*",
+      origin: '*',
       credentials: true,
     }),
   );
@@ -17,8 +18,10 @@ export const createApp = (): Application => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  registerRoutes(app);
+
   app.use((_, res) => {
-    res.status(400).json({ message: "Not found" });
+    res.status(400).json({ message: 'Not found' });
   });
 
   app.use(errorHandler);
