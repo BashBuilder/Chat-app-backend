@@ -2,26 +2,21 @@ import { createApp } from './app';
 import { createServer } from 'node:http';
 import { env } from '@/config/env';
 import { logger } from '@/utils/logger';
-import { closeDatabase, connectToDatabase } from '@/db/sequelize';
-import { initModels } from './models';
 
 const main = async () => {
   try {
-    await connectToDatabase();
-    await initModels();
-
     const app = createApp();
     const server = createServer(app);
 
-    const port = env.AUTH_SERVICE_PORT;
+    const port = env.GATEWAY_SERVICE_PORT;
 
     server.listen(port, () => {
-      logger.info({ port }, 'Auth service is running');
+      logger.info({ port }, 'Gateway service is running');
     });
 
     const shutdown = () => {
       logger.info('Shutting down service ...');
-      Promise.all([closeDatabase()])
+      Promise.all([])
         .catch((error: unknown) => {
           logger.error({ error }, 'Error during shutdown');
         })
