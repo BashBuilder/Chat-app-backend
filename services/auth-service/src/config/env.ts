@@ -10,6 +10,7 @@ const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default('15min'),
   JWT_REFRESH_SECRET: z.string().min(32),
   JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
+  INTERNAL_API_TOKEN: z.string().min(16),
 });
 
 type envType = z.infer<typeof envSchema>;

@@ -5,4 +5,5 @@ export type { Logger } from 'pino';
 export * from './errors/http-error';
 export * from './http/async-handler';
 export * from './http/validate-request';
+export * from './http/internal-auth';
 //# sourceMappingURL=index.d.ts.map
