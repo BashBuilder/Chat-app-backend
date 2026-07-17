@@ -56,6 +56,8 @@ export const publishUserRegisteredPayload = (payload: AuthUserRegisteredPayload)
   if (!published) {
     logger.warn({ event }, 'Failed to publish user regiestered event');
   }
+
+  logger.info('User registered event published');
 };
 
 export const closePublisher = async () => {

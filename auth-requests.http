@@ -1,10 +1,38 @@
-@base_url = http://localhost:4003/auth
+@base_url = http://localhost:4000/auth
 
 POST {{base_url}}/register
 Content-Type: application/json
 
 {
-  "email" : "test1@test.com",
-  "displayName" : "test1",
+  "email" : "john2@test.com",
+  "displayName" : "johndoe2",
+  "password" : "1234566790"
+}
+### auth login
+POST {{base_url}}/login
+Content-Type: application/json
+
+{
+  "email" : "john2@test.com",
+  "password" : "1234566790"
+}
+
+###
+POST {{base_url}}/register
+Content-Type: application/json
+
+{
+  "email" : "john2@test.com",
+  "displayName" : "johndoe2",
+  "password" : "1234566790"
+}
+
+###
+POST {{base_url}}/register
+Content-Type: application/json
+
+{
+  "email" : "john2@test.com",
+  "displayName" : "johndoe2",
   "password" : "1234566790"
 }

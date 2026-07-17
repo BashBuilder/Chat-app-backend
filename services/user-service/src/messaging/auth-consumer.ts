@@ -12,7 +12,6 @@ type ManageConnection = Connection & ChannelModel;
 
 let connectionRef: ManageConnection | null = null;
 let channel: Channel | null = null;
-
 let consumerTag: string | null = null;
 
 const QUEUE_NAME = 'auth-service.auth-events';
