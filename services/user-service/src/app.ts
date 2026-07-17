@@ -2,7 +2,7 @@ import express, { type Application } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import { errorHandler } from '@/middlewares/error-handler';
-import { registerRoutes } from '@/routes';
+// import { registerRoutes } from '@/routes';
 import { createInternalAuthMiddleware } from '@chatapp/common';
 import { env } from '@/config/env';
 
@@ -26,7 +26,7 @@ export const createApp = (): Application => {
     }),
   );
 
-  registerRoutes(app);
+  // registerRoutes(app);
 
   app.use('/user/health', (_, res) => {
     res.json({ status: 'Healthy' });

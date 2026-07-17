@@ -2,13 +2,13 @@ import { createApp } from './app';
 import { createServer } from 'node:http';
 import { env } from '@/config/env';
 import { logger } from '@/utils/logger';
-// import { closeDatabase, connectToDatabase } from '@/db/sequelize';
+import { closeDatabase, connectToDatabase } from '@/db/sequelize';
 // import { initModels } from '@/models';
 // import { closePublisher, initPublisher } from '@/messaging/event-publishing';
 
 const main = async () => {
   try {
-    // await connectToDatabase();
+    await connectToDatabase();
     // await initModels();
     // await initPublisher();
 
@@ -25,7 +25,8 @@ const main = async () => {
       logger.info('Shutting down service ...');
 
       Promise.all([
-        // closeDatabase(), closePublisher()
+        closeDatabase(),
+        // closePublisher()
       ])
         .catch((error: unknown) => {
           logger.error({ error }, 'Error during shutdown');
