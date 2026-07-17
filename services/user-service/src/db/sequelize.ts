@@ -15,6 +15,10 @@ export const sequelize = new Sequelize(env.USER_DB_URL, {
 export const connectToDatabase = async () => {
   await sequelize.authenticate();
   logger.info('User service connected to user db successfully');
+
+  const syncOptions = env.NODE_ENV === 'development' ? {} : { alter: true };
+  await sequelize.sync(syncOptions);
+  logger.info('Database synced');
 };
 
 export const closeDatabase = async () => {
