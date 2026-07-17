@@ -15,10 +15,10 @@ const main = async () => {
     const app = createApp();
     const server = createServer(app);
 
-    const port = env.AUTH_SERVICE_PORT;
+    const port = env.USER_SERVICE_PORT;
 
     server.listen(port, () => {
-      logger.info({ port }, 'Auth service is running');
+      logger.info({ port }, 'User service is running');
     });
 
     const shutdown = () => {
@@ -38,7 +38,7 @@ const main = async () => {
     process.on('SIGINT', shutdown);
     process.on('SIGTERM', shutdown);
   } catch (error) {
-    logger.error({ error }, 'Failed to start auth service');
+    logger.error({ error }, 'Failed to start user service');
     process.exit(1);
   }
 };

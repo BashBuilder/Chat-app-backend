@@ -3,13 +3,8 @@ import { createEnv, z } from '@chatapp/common';
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  AUTH_SERVICE_PORT: z.coerce.number().int().min(0).max(65_535).default(4003),
-  // AUTH_DB_SSL: z.boolean(),
-  AUTH_DB_URL: z.string().url(),
-  JWT_SECRET: z.string().min(32),
-  JWT_EXPIRES_IN: z.string().default('15min'),
-  JWT_REFRESH_SECRET: z.string().min(32),
-  JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
+  USER_SERVICE_PORT: z.coerce.number().int().min(0).max(65_535).default(4001),
+  USER_DB_URL: z.string().url(),
   INTERNAL_API_TOKEN: z.string().min(16),
   RABBIT_MQ_URL: z.string().url(),
 });
@@ -17,7 +12,7 @@ const envSchema = z.object({
 type envType = z.infer<typeof envSchema>;
 
 export const env: envType = createEnv(envSchema, {
-  serviceName: 'auth-service',
+  serviceName: 'User-service',
 });
 
 export type Env = typeof env;

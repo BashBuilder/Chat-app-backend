@@ -3,7 +3,7 @@ import { UnauthorizedError } from '../errors/http-error';
 
 export interface InternalAuthOptions {
   headerName?: string;
-  exemptPath?: string;
+  exemptPaths?: string[];
 }
 
 const DEFAULT_HEADER_NAME = 'x-internal-token';
@@ -13,7 +13,7 @@ export const createInternalAuthMiddleware = (
   options: InternalAuthOptions = {},
 ): RequestHandler => {
   const headerName = options.headerName?.toLowerCase() ?? DEFAULT_HEADER_NAME;
-  const exemptPaths = new Set(options.exemptPath ?? []);
+  const exemptPaths = new Set(options.exemptPaths ?? []);
 
   return (req, _, next) => {
     if (exemptPaths.has(req.path)) {

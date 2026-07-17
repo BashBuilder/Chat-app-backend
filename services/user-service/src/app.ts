@@ -20,9 +20,17 @@ export const createApp = (): Application => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  app.use(createInternalAuthMiddleware(env.INTERNAL_API_TOKEN));
+  app.use(
+    createInternalAuthMiddleware(env.INTERNAL_API_TOKEN, {
+      exemptPaths: ['/user/health'],
+    }),
+  );
 
   registerRoutes(app);
+
+  app.use('/user/health', (_, res) => {
+    res.json({ status: 'Healthy' });
+  });
 
   app.use((_, res) => {
     res.status(400).json({ message: 'Not found' });
