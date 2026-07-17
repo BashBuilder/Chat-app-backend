@@ -1,5 +1,6 @@
 import { AuthResponse, RegisterInput, UserData } from '@/__types__/auth';
 import { sequelize } from '@/db/sequelize';
+import { publishUserRegisteredPayload } from '@/messaging/event-publishing';
 import { RefreshToken } from '@/models/refresh-token.model';
 import { UserCredentials } from '@/models/user-credentials.model';
 import { hashPassword, signAccessToken, signRefreshToken } from '@/utils/token';
@@ -37,7 +38,7 @@ export const register = async (input: RegisterInput): Promise<AuthResponse> => {
     const accessToken = signAccessToken({ sub: user.id, email: user.email });
     const refreshToken = signRefreshToken({ sub: user.id, tokenId: refreshTokenRecord.tokenId });
 
-    const userData: UserData = {
+    const userData = {
       id: user.id,
       email: user.email,
       displayName: user.displayName,
@@ -45,6 +46,7 @@ export const register = async (input: RegisterInput): Promise<AuthResponse> => {
     };
 
     // TODO : publish event user registered
+    publishUserRegisteredPayload(userData);
 
     return {
       accessToken,
