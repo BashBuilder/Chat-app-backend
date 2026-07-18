@@ -1,4 +1,5 @@
 import { CreateUserInput, User } from '@/__types__/user';
+import { publishUserCreatedEvent } from '@/messaging/event-publisher';
 import { userRepository, UserRepository } from '@/repository/user.repository';
 import { AuthUserRegisteredPayload, ConflictError, NotFoundError } from '@chatapp/common';
 import { UniqueConstraintError } from 'sequelize';
@@ -21,7 +22,12 @@ class UserService {
   async createUser(input: CreateUserInput): Promise<User> {
     try {
       const user = await this.repository.create(input);
-      //publish a new user created event todo
+      void publishUserCreatedEvent({
+        id: user.id,
+        email: user.email,
+        displayName: user.displayName,
+        createdAt: user.createdAt.toISOString(),
+      });
       return user;
     } catch (error) {
       if (error instanceof UniqueConstraintError) throw new ConflictError('User already exists');
@@ -48,8 +54,12 @@ class UserService {
 
   async syncFromAuthUser(payload: AuthUserRegisteredPayload): Promise<User> {
     const user = await this.repository.upsertFromAuthEvent(payload);
-
-    //publish a new user created event todo
+    void publishUserCreatedEvent({
+      id: user.id,
+      email: user.email,
+      displayName: user.displayName,
+      createdAt: user.createdAt.toISOString(),
+    });
     return user;
   }
 }

@@ -11,6 +11,9 @@ const toDomainUser = (model: UserModel): User => ({
   updatedAt: model.updatedAt,
 });
 
+// add some functions here
+
+
 export class UserRepository {
   async findById(id: string): Promise<User | null> {
     const user = await UserModel.findByPk(id);
