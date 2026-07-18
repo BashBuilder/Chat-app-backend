@@ -9,9 +9,10 @@ services:
     ports:
       - '${USER_DB_PORT:-5432}:5432'
     volumes:
-      - user-db-data:/var/var/postgresql/data
+      - user-db-data:/var/lib/postgresql/data
     networks:
       - chatapp-network
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: chatapp-rabbitmq
@@ -23,6 +24,7 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
     networks:
       - chatapp-network
+
   auth-db:
     image: mysql:8.0
     container_name: chatapp-auth-db

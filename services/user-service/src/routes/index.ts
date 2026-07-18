@@ -1,5 +1,6 @@
 import { Router } from 'express';
+import { userRouter } from './user.route';
 
 export const registerRoutes = (app: Router) => {
-  app.use('/');
+  app.use('/users', userRouter);
 };

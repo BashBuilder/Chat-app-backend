@@ -5,6 +5,7 @@ import { errorHandler } from '@/middlewares/error-handler';
 // import { registerRoutes } from '@/routes';
 import { createInternalAuthMiddleware } from '@chatapp/common';
 import { env } from '@/config/env';
+import { registerRoutes } from './routes';
 
 export const createApp = (): Application => {
   const app = express();
@@ -26,7 +27,7 @@ export const createApp = (): Application => {
     }),
   );
 
-  // registerRoutes(app);
+  registerRoutes(app);
 
   app.use('/user/health', (_, res) => {
     res.json({ status: 'Healthy' });
