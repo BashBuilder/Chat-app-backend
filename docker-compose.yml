@@ -13,6 +13,29 @@ services:
     networks:
       - chatapp-network
 
+  mongo:
+    image: mongo:latest
+    container_name: chatapp-mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-chatapp_mongo}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-chatapp_password}
+    ports:
+      - '${MONGO_PORT:-27017}:27017'
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - chatapp-network
+
+  redis:
+    image: redis:latest
+    container_name: chatapp-redis
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis-data:/data
+    networks:
+      - chatapp-network
+
   rabbitmq:
     image: rabbitmq:3-management
     container_name: chatapp-rabbitmq
@@ -44,6 +67,8 @@ services:
 volumes:
   user-db-data:
   auth-db-data:
+  mongo-data:
+  redis-data:
 
 networks:
   chatapp-network:
