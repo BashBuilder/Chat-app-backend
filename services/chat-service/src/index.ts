@@ -2,15 +2,12 @@ import { createApp } from './app';
 import { createServer } from 'node:http';
 import { env } from '@/config/env';
 import { logger } from '@/utils/logger';
-// import { closeDatabase, connectToDatabase } from '@/db/sequelize';
-// import { startAuthEventConsumer } from './messaging/auth-consumer';
-// import { closeMessaging, initMessaging } from './messaging/event-publisher';
+import { closeMongoClient, getMongoClient } from './clients/mongo.client';
+import { closeRedisClient, getRedisClient } from './clients/redis-client';
 
 const main = async () => {
   try {
-    // await connectToDatabase();
-    // await startAuthEventConsumer();
-    // await initMessaging();
+    await Promise.all([getMongoClient(), getRedisClient()]);
 
     const app = createApp();
     const server = createServer(app);
@@ -24,9 +21,7 @@ const main = async () => {
     const shutdown = () => {
       logger.info('Shutting down service ...');
 
-      Promise.all([
-        // closeDatabase(), closeMessaging()
-      ])
+      Promise.all([closeMongoClient(), closeRedisClient()])
         .catch((error: unknown) => {
           logger.error({ error }, 'Error during shutdown');
         })
