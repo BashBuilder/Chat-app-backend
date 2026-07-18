@@ -5,7 +5,6 @@ import { logger } from '@/utils/logger';
 import { closeDatabase, connectToDatabase } from '@/db/sequelize';
 import { startAuthEventConsumer } from './messaging/auth-consumer';
 import { closeMessaging, initMessaging } from './messaging/event-publisher';
-// import { initModels } from '@/models';
 
 const main = async () => {
   try {

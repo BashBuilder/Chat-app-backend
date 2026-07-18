@@ -4,8 +4,8 @@ POST {{base_url}}/register
 Content-Type: application/json
 
 {
-  "email" : "john2@test.com",
-  "displayName" : "johndoe2",
+  "email" : "john4@test.com",
+  "displayName" : "johndoe4",
   "password" : "1234566790"
 }
 ### auth login
@@ -28,11 +28,11 @@ Content-Type: application/json
 }
 
 ###
-POST {{base_url}}/register
+POST {{base_url}}/user
 Content-Type: application/json
 
 {
-  "email" : "john2@test.com",
-  "displayName" : "johndoe2",
-  "password" : "1234566790"
+  "email" : "new1@test.com",
+  "displayName" : "new1doe2",
+
 }
