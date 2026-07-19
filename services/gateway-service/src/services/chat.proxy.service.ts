@@ -81,7 +81,15 @@ export interface CreateConversationPayload {
 }
 
 export interface CreateMessagePayload {
+  conversationId: string;
   body: string;
+}
+
+export interface ListMessagesPayload {
+  conversationId: string;
+  limit?: number;
+  before?: string;
+  after?: string;
 }
 
 export const chatProxyService = {
@@ -125,6 +133,40 @@ export const chatProxyService = {
           [USER_ID_HEADER]: userId,
         },
       });
+      return response.data;
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+  },
+
+  async createMessage(userId: string, payload: CreateMessagePayload): Promise<MessageDto> {
+    try {
+      const response = await client.post<MessageResponse>(
+        `/conversations/${payload.conversationId}/messages`,
+        {
+          headers: {
+            [USER_ID_HEADER]: userId,
+          },
+          data: payload,
+        },
+      );
+      return response.data.data;
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+  },
+
+  async listMessages(userId: string, payload: ListMessagesPayload): Promise<MessageListResponse> {
+    try {
+      const response = await client.get<MessageListResponse>(
+        `/conversations/${payload.conversationId}/messages`,
+        {
+          headers: {
+            [USER_ID_HEADER]: userId,
+          },
+          params: payload,
+        },
+      );
       return response.data;
     } catch (error) {
       return handleAxiosError(error);

@@ -1,9 +1,16 @@
 import { conversationService } from '@/services/conversation.service';
+import { messageService } from '@/services/message.service';
 import { getAuthicatedUser } from '@/utils/auth';
 import {
   createConversationSchema,
   listConversationsQuerySchema,
 } from '@/validations/conversation.schema';
+import {
+  createMessageBodySchema,
+  createMessageSchema,
+  listMessagesQuerySchema,
+  messageIdSchema,
+} from '@/validations/message.schema';
 import { conversationIdSchema } from '@/validations/shared.schema';
 import {
   asyncHandler,
@@ -62,4 +69,47 @@ export const getConversationHandler: RequestHandler = asyncHandler(async (req, r
     throw new UnauthorizedError('Only the participant can get conversation');
 
   res.status(200).json(conversation);
+});
+
+export const createMessageHandler: RequestHandler = asyncHandler(async (req, res, next) => {
+  const user = getAuthicatedUser(req);
+  const conversationId = parseConversation(req.params);
+  const payload = createMessageBodySchema.parse(req.body);
+
+  const message = await messageService.createMessage({
+    conversationId,
+    senderId: user.id,
+    body: payload.body,
+  });
+  res.status(201).json(message);
+});
+
+export const listMessagesHandler: RequestHandler = asyncHandler(async (req, res, next) => {
+  const user = getAuthicatedUser(req);
+  const conversationId = parseConversation(req.params);
+  const filter = listMessagesQuerySchema.parse(req.validated?.query);
+
+  if (!filter.limit) throw new BadRequestError('Limit is required');
+
+  const messages = await messageService.getMessages({
+    conversationId,
+    limit: filter.limit,
+    before: filter.before,
+    after: filter.after,
+  });
+
+  res.status(200).json(messages);
+});
+
+export const getMessageHandler: RequestHandler = asyncHandler(async (req, res, next) => {
+  const user = getAuthicatedUser(req);
+  const { id } = messageIdSchema.parse(req.params);
+  if (!id) throw new BadRequestError('Message id is required');
+
+  const message = await messageService.getMessageById(id);
+
+  if (!message.senderId.includes(user.id) && message.senderId !== user.id)
+    throw new UnauthorizedError('Only the sender can get message');
+
+  res.status(200).json(message);
 });

@@ -5,12 +5,11 @@ import {
   CreateConversationInput,
 } from '@/__types__/conversation';
 import { getMongoClient } from '@/clients/mongo.client';
-import { HttpError } from '@chatapp/common';
 import { Document, ObjectId, WithId } from 'mongodb';
 import { randomUUID } from 'node:crypto';
+import { messageCollection } from './message.repository';
 
 const CONVERSATIONS_COLLECTION_NAME = 'conversations';
-const MESSAGES_COLLECTION_NAME = 'messages';
 
 const toConversation = (doc: WithId<Document>): Conversation => ({
   id: String(doc._id),
@@ -28,12 +27,6 @@ const conversationCollection = async () => {
   const client = await getMongoClient();
   const db = client.db();
   return db.collection(CONVERSATIONS_COLLECTION_NAME);
-};
-
-const messageCollection = async () => {
-  const client = await getMongoClient();
-  const db = client.db();
-  return db.collection(MESSAGES_COLLECTION_NAME);
 };
 
 export const conversationRepository = {
