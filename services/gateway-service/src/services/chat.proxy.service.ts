@@ -100,4 +100,30 @@ export const chatProxyService = {
       return handleAxiosError(error);
     }
   },
+
+  async listConversations(userId: string): Promise<ConversationListResponse> {
+    try {
+      const response = await client.get<ConversationListResponse>(`/conversations`, {
+        headers: {
+          [USER_ID_HEADER]: userId,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+  },
+
+  async getConversation(userId: string, id: string): Promise<ConversationDto> {
+    try {
+      const response = await client.get<ConversationResponse>(`/conversations/${id}`, {
+        headers: {
+          [USER_ID_HEADER]: userId,
+        },
+      });
+      return response.data.data;
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+  },
 };
