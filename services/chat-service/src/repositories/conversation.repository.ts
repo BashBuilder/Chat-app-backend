@@ -53,7 +53,7 @@ export const conversationRepository = {
   },
   async findById(id: string): Promise<Conversation | null> {
     const collection = await conversationCollection();
-    const document = await collection.findOne({ _id: new ObjectId(id) });
+    const document = await collection.findOne({ _id: id as unknown as ObjectId });
     return document ? toConversation(document) : null;
   },
 
@@ -71,7 +71,7 @@ export const conversationRepository = {
   async touchConversation(id: string, preview: string): Promise<void> {
     const collection = await conversationCollection();
     const document = await collection.updateOne(
-      { _id: new ObjectId(id) },
+      { _id: id as unknown as ObjectId },
       { $set: { lastMessageAt: new Date(), lastMessagePreview: preview, updatedAt: new Date() } },
     );
     return;

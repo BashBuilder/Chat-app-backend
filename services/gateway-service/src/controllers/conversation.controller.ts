@@ -27,7 +27,7 @@ export const createConversationHandler: RequestHandler = asyncHandler(async (req
 
 export const listConversationsHandler: RequestHandler = asyncHandler(async (req, res, next) => {
   const user = getAuthicatedUser(req);
-  const { participantId } = listConversationsQuerySchema.parse(req.query);
+  const { participantId } = listConversationsQuerySchema.parse(req.validated?.query);
   if (!participantId) throw new BadRequestError('Participant id is required');
   if (participantId !== user.id)
     throw new BadRequestError('Only the participant can list conversations');

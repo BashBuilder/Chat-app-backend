@@ -10,14 +10,22 @@ export const validateRequest = (schemas) => {
             if (schemas.body) {
                 const parsedBody = schemas.body.parse(req.body);
                 req.body = parsedBody;
+                req.validated = {
+                    body: parsedBody,
+                };
             }
             if (schemas.params) {
                 const parsedParams = schemas.params.parse(req.params);
                 req.params = parsedParams;
+                req.validated = {
+                    params: parsedParams,
+                };
             }
             if (schemas.query) {
                 const parsedQuery = schemas.query.parse(req.query);
-                req.query = parsedQuery;
+                req.validated = {
+                    query: parsedQuery,
+                };
             }
             next();
         }

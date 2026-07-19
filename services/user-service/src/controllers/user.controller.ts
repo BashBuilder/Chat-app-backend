@@ -34,7 +34,7 @@ export const createUser: AsyncHandler = async (req, res, next) => {
 
 export const searchUsers: AsyncHandler = async (req, res, next) => {
   try {
-    const { query, limit, excludeIds } = req.query as unknown as SearchUsersQueryParams;
+    const { query, limit, excludeIds } = req.validated?.query as unknown as SearchUsersQueryParams;
     const users = await userService.searchUsers({ query, limit, excludeIds });
     res.status(200).json(users);
   } catch (error) {

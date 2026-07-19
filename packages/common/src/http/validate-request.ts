@@ -24,16 +24,24 @@ export const validateRequest = (schemas: RequestValidationSchemas) => {
       if (schemas.body) {
         const parsedBody = schemas.body.parse(req.body) as unknown;
         req.body = parsedBody;
+        req.validated = {
+          body: parsedBody as Request['body'],
+        };
       }
 
       if (schemas.params) {
         const parsedParams = schemas.params.parse(req.params) as ParamsRecord;
         req.params = parsedParams as Request['params'];
+        req.validated = {
+          params: parsedParams as Request['params'],
+        };
       }
 
       if (schemas.query) {
         const parsedQuery = schemas.query.parse(req.query) as QueryRecord;
-        req.query = parsedQuery as Request['query'];
+        req.validated = {
+          query: parsedQuery as Request['query'],
+        };
       }
 
       next();
