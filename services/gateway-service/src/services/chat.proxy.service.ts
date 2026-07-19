@@ -103,11 +103,15 @@ export const chatProxyService = {
 
   async listConversations(userId: string): Promise<ConversationListResponse> {
     try {
-      const response = await client.get<ConversationListResponse>(`/conversations`, {
-        headers: {
-          [USER_ID_HEADER]: userId,
+      const response = await client.get<ConversationListResponse>(
+        `/conversations?participantId=${userId}`,
+
+        {
+          headers: {
+            [USER_ID_HEADER]: userId,
+          },
         },
-      });
+      );
       return response.data;
     } catch (error) {
       return handleAxiosError(error);
@@ -116,12 +120,12 @@ export const chatProxyService = {
 
   async getConversation(userId: string, id: string): Promise<ConversationDto> {
     try {
-      const response = await client.get<ConversationResponse>(`/conversations/${id}`, {
+      const response = await client.get<ConversationDto>(`/conversations/${id}`, {
         headers: {
           [USER_ID_HEADER]: userId,
         },
       });
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleAxiosError(error);
     }
