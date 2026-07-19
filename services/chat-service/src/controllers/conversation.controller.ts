@@ -38,7 +38,7 @@ export const createConversationHandler: RequestHandler = asyncHandler(async (req
 
 export const listConversationsHandler: RequestHandler = asyncHandler(async (req, res, next) => {
   const user = getAuthicatedUser(req);
-  const filter = listConversationsQuerySchema.parse(req.query);
+  const filter = listConversationsQuerySchema.parse(req.validated?.query);
 
   if (!filter.participantId) throw new BadRequestError('Participant id is required');
   if (filter.participantId !== user.id)
