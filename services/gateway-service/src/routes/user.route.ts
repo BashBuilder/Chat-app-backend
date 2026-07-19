@@ -6,22 +6,9 @@ import { Router } from 'express';
 
 export const userRouter: Router = Router();
 
-userRouter.get('/', requireAuth, asyncHandler(getAllUsers));
-userRouter.get(
-  '/:id',
-  requireAuth,
-  validateRequest({ query: userIdParamsSchema }),
-  asyncHandler(getUser),
-);
-userRouter.post(
-  '/',
-  requireAuth,
-  validateRequest({ body: createUserSchema }),
-  asyncHandler(createUser),
-);
-userRouter.get(
-  '/search',
-  requireAuth,
-  validateRequest({ query: searchUsersSchema }),
-  asyncHandler(searchUsers),
-);
+userRouter.use(requireAuth);
+
+userRouter.get('/', asyncHandler(getAllUsers));
+userRouter.get('/:id', validateRequest({ query: userIdParamsSchema }), asyncHandler(getUser));
+userRouter.post('/', validateRequest({ body: createUserSchema }), asyncHandler(createUser));
+userRouter.get('/search', validateRequest({ query: searchUsersSchema }), asyncHandler(searchUsers));

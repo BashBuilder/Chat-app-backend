@@ -14,7 +14,7 @@ export const conversationService = {
     return conversation;
   },
 
-  async getConversationById(id: string): Promise<Conversation | null> {
+  async getConversationById(id: string): Promise<Conversation> {
     const cached = await conversationCache.get(id);
     if (cached) {
       return cached;

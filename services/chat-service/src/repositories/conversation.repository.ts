@@ -60,7 +60,9 @@ export const conversationRepository = {
   async findSummaries(filter: ConversationFilter): Promise<ConversationSummary[]> {
     const collection = await conversationCollection();
     const documents = await collection
-      .find(filter)
+      .find({
+        participantIds: filter.participantId,
+      })
       .sort({ lastMessageAt: -1, updatedAt: -1 })
       .toArray();
     return documents.map(toConversationSummary);

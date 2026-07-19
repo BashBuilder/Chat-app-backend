@@ -14,8 +14,7 @@ export interface CreateConversationInput {
 }
 
 export interface ConversationFilter {
-  title?: string | null;
-  participantIds?: string[];
+  participantId: string;
 }
 
 export type ConversationSummary = Conversation;
