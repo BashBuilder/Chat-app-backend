@@ -6,7 +6,7 @@
   "private": "true",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsx --project tsconfig.json",
+    "build": "tsc --project tsconfig.json",
     "dev": "tsx watch src/index",
     "start": "node dist/index.js",
     "lint": "eslint \"src/**/*.ts\"",

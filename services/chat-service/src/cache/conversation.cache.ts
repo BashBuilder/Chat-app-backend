@@ -33,7 +33,6 @@ const deserialize = (value: string): Conversation => {
 export const conversationCache = {
   async get(id: string): Promise<Conversation | null> {
     const redis = await getRedisClient();
-    const value = localStorage.getItem(`${CACHE_KEY_PREFIX}:${id}`);
 
     const payload = await redis.get(`${CACHE_KEY_PREFIX}:${id}`);
     return payload ? deserialize(payload) : null;

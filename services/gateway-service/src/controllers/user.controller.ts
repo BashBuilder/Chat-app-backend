@@ -41,7 +41,7 @@ export const createUser: AsyncHandler = async (req, res, next) => {
 export const searchUsers: AsyncHandler = async (req, res, next) => {
   try {
     const user = getAuthicatedUser(req);
-    const { query, limit, excludeIds } = searchUsersSchema.parse(req.query);
+    const { query, limit, excludeIds } = searchUsersSchema.parse(req.validated?.query);
 
     const sanitizedExcludeIds = Array.from(new Set([...(excludeIds || []), user.id]));
     const users = await userProxyService.searchUsers({

@@ -81,7 +81,15 @@ export interface CreateConversationPayload {
 }
 
 export interface CreateMessagePayload {
+  conversationId: string;
   body: string;
+}
+
+export interface ListMessagesPayload {
+  conversationId: string;
+  limit?: number;
+  before?: string;
+  after?: string;
 }
 
 export const chatProxyService = {
@@ -103,7 +111,24 @@ export const chatProxyService = {
 
   async listConversations(userId: string): Promise<ConversationListResponse> {
     try {
-      const response = await client.get<ConversationListResponse>(`/conversations`, {
+      const response = await client.get<ConversationListResponse>(
+        `/conversations?participantId=${userId}`,
+
+        {
+          headers: {
+            [USER_ID_HEADER]: userId,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+  },
+
+  async getConversation(userId: string, id: string): Promise<ConversationDto> {
+    try {
+      const response = await client.get<ConversationDto>(`/conversations/${id}`, {
         headers: {
           [USER_ID_HEADER]: userId,
         },
@@ -114,14 +139,37 @@ export const chatProxyService = {
     }
   },
 
-  async getConversation(userId: string, id: string): Promise<ConversationDto> {
+  async createMessage(userId: string, payload: CreateMessagePayload): Promise<MessageDto> {
     try {
-      const response = await client.get<ConversationResponse>(`/conversations/${id}`, {
-        headers: {
-          [USER_ID_HEADER]: userId,
+      const response = await client.post<MessageDto>(
+        `/conversations/${payload.conversationId}/messages`,
+        {
+          body: payload.body,
         },
-      });
-      return response.data.data;
+        {
+          headers: {
+            [USER_ID_HEADER]: userId,
+          },
+        },
+      );
+      return response.data;
+    } catch (error) {
+      return handleAxiosError(error);
+    }
+  },
+
+  async listMessages(userId: string, payload: ListMessagesPayload): Promise<MessageListResponse> {
+    try {
+      const response = await client.get<MessageListResponse>(
+        `/conversations/${payload.conversationId}/messages`,
+        {
+          headers: {
+            [USER_ID_HEADER]: userId,
+          },
+          params: payload,
+        },
+      );
+      return response.data;
     } catch (error) {
       return handleAxiosError(error);
     }

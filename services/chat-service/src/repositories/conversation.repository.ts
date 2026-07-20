@@ -5,12 +5,11 @@ import {
   CreateConversationInput,
 } from '@/__types__/conversation';
 import { getMongoClient } from '@/clients/mongo.client';
-import { HttpError } from '@chatapp/common';
 import { Document, ObjectId, WithId } from 'mongodb';
 import { randomUUID } from 'node:crypto';
+import { messageCollection } from './message.repository';
 
 const CONVERSATIONS_COLLECTION_NAME = 'conversations';
-const MESSAGES_COLLECTION_NAME = 'messages';
 
 const toConversation = (doc: WithId<Document>): Conversation => ({
   id: String(doc._id),
@@ -30,12 +29,6 @@ const conversationCollection = async () => {
   return db.collection(CONVERSATIONS_COLLECTION_NAME);
 };
 
-const messageCollection = async () => {
-  const client = await getMongoClient();
-  const db = client.db();
-  return db.collection(MESSAGES_COLLECTION_NAME);
-};
-
 export const conversationRepository = {
   async create(input: CreateConversationInput): Promise<Conversation> {
     const collection = await conversationCollection();
@@ -53,7 +46,7 @@ export const conversationRepository = {
   },
   async findById(id: string): Promise<Conversation | null> {
     const collection = await conversationCollection();
-    const document = await collection.findOne({ _id: new ObjectId(id) });
+    const document = await collection.findOne({ _id: id as unknown as ObjectId });
     return document ? toConversation(document) : null;
   },
 
@@ -71,7 +64,7 @@ export const conversationRepository = {
   async touchConversation(id: string, preview: string): Promise<void> {
     const collection = await conversationCollection();
     const document = await collection.updateOne(
-      { _id: new ObjectId(id) },
+      { _id: id as unknown as ObjectId },
       { $set: { lastMessageAt: new Date(), lastMessagePreview: preview, updatedAt: new Date() } },
     );
     return;

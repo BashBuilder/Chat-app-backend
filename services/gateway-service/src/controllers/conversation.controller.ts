@@ -5,6 +5,7 @@ import {
   createConversationSchema,
   listConversationsQuerySchema,
 } from '@/validation/conversaton.schema';
+import { createMessageBodySchema, listMessagesQuerySchema } from '@/validation/message.schema';
 import { AsyncHandler, asyncHandler, BadRequestError } from '@chatapp/common';
 import { RequestHandler } from 'express';
 
@@ -27,7 +28,7 @@ export const createConversationHandler: RequestHandler = asyncHandler(async (req
 
 export const listConversationsHandler: RequestHandler = asyncHandler(async (req, res, next) => {
   const user = getAuthicatedUser(req);
-  const { participantId } = listConversationsQuerySchema.parse(req.query);
+  const { participantId } = listConversationsQuerySchema.parse(req.validated?.query);
   if (!participantId) throw new BadRequestError('Participant id is required');
   if (participantId !== user.id)
     throw new BadRequestError('Only the participant can list conversations');
@@ -47,4 +48,34 @@ export const getConversationHandler: RequestHandler = asyncHandler(async (req, r
     throw new BadRequestError('Only the participant can get conversation');
 
   res.status(200).json(conversation);
+});
+
+export const createMessageHandler: RequestHandler = asyncHandler(async (req, res, next) => {
+  const user = getAuthicatedUser(req);
+  const conversationId = conversationIdSchema.parse(req.params);
+  const payload = createMessageBodySchema.parse(req.body);
+
+  const message = await chatProxyService.createMessage(user.id, {
+    conversationId: conversationId.id,
+    body: payload.body,
+  });
+
+  res.status(201).json(message);
+});
+
+export const listMessagesHandler: RequestHandler = asyncHandler(async (req, res, next) => {
+  const user = getAuthicatedUser(req);
+  const conversationId = conversationIdSchema.parse(req.params);
+  const filter = listMessagesQuerySchema.parse(req.validated?.query);
+
+  if (!filter.limit) throw new BadRequestError('Limit is required');
+
+  const messages = await chatProxyService.listMessages(user.id, {
+    conversationId: conversationId.id,
+    limit: filter.limit,
+    before: filter.before,
+    after: filter.after,
+  });
+
+  res.status(200).json(messages);
 });
