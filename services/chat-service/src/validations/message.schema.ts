@@ -5,7 +5,7 @@ export const createMessageBodySchema = z.object({
 });
 
 export const createMessageSchema = z.object({
-  conversationId: z.string().uuid(),
+  body: z.string().min(1).max(1000),
 });
 
 export const listMessagesQuerySchema = z.object({

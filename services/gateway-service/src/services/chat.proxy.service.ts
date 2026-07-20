@@ -141,16 +141,18 @@ export const chatProxyService = {
 
   async createMessage(userId: string, payload: CreateMessagePayload): Promise<MessageDto> {
     try {
-      const response = await client.post<MessageResponse>(
+      const response = await client.post<MessageDto>(
         `/conversations/${payload.conversationId}/messages`,
+        {
+          body: payload.body,
+        },
         {
           headers: {
             [USER_ID_HEADER]: userId,
           },
-          data: payload,
         },
       );
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return handleAxiosError(error);
     }

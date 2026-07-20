@@ -11,7 +11,7 @@ import {
   createConversationSchema,
   listConversationsQuerySchema,
 } from '@/validation/conversaton.schema';
-import { createMessageBodySchema } from '@/validation/message.schema';
+import { createMessageBodySchema, listMessagesQuerySchema } from '@/validation/message.schema';
 import { validateRequest } from '@chatapp/common';
 import { Router } from 'express';
 
@@ -39,6 +39,6 @@ chatRouter.post(
 
 chatRouter.get(
   '/:id/messages',
-  validateRequest({ params: conversationIdSchema }),
+  validateRequest({ params: conversationIdSchema, query: listMessagesQuerySchema }),
   listMessagesHandler,
 );

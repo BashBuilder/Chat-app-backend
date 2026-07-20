@@ -73,11 +73,11 @@ export const getConversationHandler: RequestHandler = asyncHandler(async (req, r
 
 export const createMessageHandler: RequestHandler = asyncHandler(async (req, res, next) => {
   const user = getAuthicatedUser(req);
-  const conversationId = parseConversation(req.params);
+  const id = parseConversation(req.params);
   const payload = createMessageBodySchema.parse(req.body);
 
   const message = await messageService.createMessage({
-    conversationId,
+    conversationId: id,
     senderId: user.id,
     body: payload.body,
   });
