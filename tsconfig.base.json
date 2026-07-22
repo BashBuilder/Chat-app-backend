@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
     "lib": ["ES2022"],
     "strict": true,
     "skipLibCheck": true,
@@ -15,7 +13,9 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "types": ["node"]
+    "types": ["node"],
+    "module": "esnext",
+    "moduleResolution": "bundler"
   },
   "exclude": ["dist", "build", "coverage", "node_modules"]
 }

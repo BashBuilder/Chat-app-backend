@@ -2,7 +2,7 @@
   "name": "chatapp",
   "version": "1.0.0",
   "description": "",
-  "private": "true",
+  "private": true,
   "scripts": {
     "build": "pnpm -r --workspace-root=false run build",
     "dev": "pnpm -r --workspace-root=false run dev",
@@ -13,13 +13,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.7.0",
-      "onFail": "download"
-    }
-  },
   "type": "module",
   "devDependencies": {
     "@types/eslint": "^9.6.1",

@@ -37,6 +37,11 @@ COPY services/auth-service ./services/auth-service
 # Build dependencies first
 RUN pnpm --filter @chatapp/common build
 
+RUN pnpm list --filter @chatapp/common --depth=0
+RUN ls -la packages/common
+RUN ls -la packages/common/node_modules
+RUN ls -la node_modules
+
 # Then build the service
 RUN pnpm --filter @chatapp/auth-service build
 
