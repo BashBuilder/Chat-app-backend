@@ -76,5 +76,5 @@ WORKDIR /app/services/auth-service
 
 EXPOSE 4003
 
-# CMD ["node", "dist/index.js"]
-CMD ["pnpm", "dev"]
+CMD ["node", "dist/index.js"]
+# CMD ["pnpm", "dev"]
