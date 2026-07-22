@@ -88,18 +88,13 @@ services:
     healthcheck:
       test:
         [
-          'CMD',
-          'mysqladmin',
-          'ping',
-          '-h',
-          'localhost',
-          '-u',
-          '${AUTH_DB_USER:-chatapp_auth_user}',
-          '-p${AUTH_DB_PASSWORD:-chatapp_auth_password}',
+          'CMD-SHELL',
+          'mysqladmin ping -h localhost -u root -p${AUTH_DB_ROOT_PASSWORD:-root_password}',
         ]
-      interval: 10s
+      interval: 5s
       timeout: 5s
-      retries: 5
+      retries: 10
+      start_period: 20s
 
   auth-service:
     build:
@@ -131,7 +126,7 @@ services:
         condition: service_healthy
     networks:
       - chatapp-network
-    restart: no
+    restart: unless-stopped
 
 volumes:
   user-db-data:
