@@ -22,13 +22,16 @@ export const createApp = (): Application => {
 
   app.use(
     createInternalAuthMiddleware(env.INTERNAL_API_TOKEN, {
-      exemptPaths: ['/auth/health'],
+      exemptPaths: ['/auth/health', '/health'],
     }),
   );
 
   registerRoutes(app);
 
   app.use('/auth/health', (_, res) => {
+    res.json({ status: 'Healthy' });
+  });
+  app.use('/health', (_, res) => {
     res.json({ status: 'Healthy' });
   });
 
