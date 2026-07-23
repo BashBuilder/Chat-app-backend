@@ -20,6 +20,10 @@ export const createApp = (): Application => {
 
   registerRoutes(app);
 
+  app.use('/health', (_, res) => {
+    res.json({ status: 'Healthy' });
+  });
+
   app.use((_, res) => {
     res.status(400).json({ message: 'Not found' });
   });

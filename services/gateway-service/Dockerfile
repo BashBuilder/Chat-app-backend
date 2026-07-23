@@ -20,7 +20,7 @@ COPY tsconfig.base.json tsconfig.json ./
 
 # Workspace package manifests
 COPY packages/common/package.json ./packages/common/
-COPY services/auth-service/package.json ./services/auth-service/
+COPY services/gateway-service/package.json ./services/gateway-service/
 
 # Install all dependencies needed for building
 RUN pnpm install --frozen-lockfile --ignore-scripts
@@ -32,7 +32,7 @@ FROM deps AS build
 
 # Copy source
 COPY packages/common ./packages/common
-COPY services/auth-service ./services/auth-service
+COPY services/gateway-service ./services/gateway-service
 
 # Build dependencies first
 RUN pnpm --filter @chatapp/common build
@@ -43,7 +43,7 @@ RUN ls -la packages/common/node_modules
 RUN ls -la node_modules
 
 # Then build the service
-RUN pnpm --filter @chatapp/auth-service build
+RUN pnpm --filter @chatapp/gateway-service build
 
 # -------------------------
 # Production
@@ -51,7 +51,7 @@ RUN pnpm --filter @chatapp/auth-service build
 FROM base AS production
 
 ENV NODE_ENV=production
-ENV AUTH_SERVICE_PORT=4003
+ENV CHAT_SERVICE_PORT=4000
 
 # Create non-root user
 RUN addgroup -S nodejs && \
@@ -63,23 +63,23 @@ COPY tsconfig.base.json tsconfig.json ./
 
 # Workspace manifests
 COPY packages/common/package.json ./packages/common/
-COPY services/auth-service/package.json ./services/auth-service/
+COPY services/gateway-service/package.json ./services/gateway-service/
 
 # Install only production dependencies
 RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # Copy compiled output
 COPY --from=build /app/packages/common/dist ./packages/common/dist
-COPY --from=build /app/services/auth-service/dist ./services/auth-service/dist
+COPY --from=build /app/services/gateway-service/dist ./services/gateway-service/dist
 
 # Give ownership to the application user
 RUN chown -R nodeuser:nodejs /app
 
 USER nodeuser
 
-WORKDIR /app/services/auth-service
+WORKDIR /app/services/gateway-service
 
-EXPOSE 4003
+EXPOSE 4000
 
 CMD ["node", "dist/index.js"]
 # CMD ["pnpm", "dev"]

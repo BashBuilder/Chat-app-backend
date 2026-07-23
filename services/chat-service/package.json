@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
-  "private": "true",
+  "private": true,
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json --resolve-full-paths",
     "dev": "tsx watch src/index",
     "start": "node dist/index.js",
     "lint": "eslint \"src/**/*.ts\"",
@@ -25,7 +25,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.5.0",
     "sequelize": "^6.37.8",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "tsc-alias": "^1.9.1"
   },
   "devDependencies": {
     "@types/amqplib": "^0.10.8",
