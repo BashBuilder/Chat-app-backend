@@ -388,6 +388,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
+      tsc-alias:
+        specifier: ^1.9.1
+        version: 1.9.1
     devDependencies:
       '@types/cors':
         specifier: ^2.8.19

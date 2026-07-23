@@ -126,6 +126,41 @@ services:
         condition: service_healthy
     networks:
       - chatapp-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4003/health']
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  chat-service:
+    build:
+      context: .
+      dockerfile: services/chat-service/Dockerfile
+    container_name: chatapp_chat_service
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      CHAT_SERVICE_PORT: ${CHAT_SERVICE_PORT:-4002}
+      USER_DB_URL: ${USER_DB_URL:postgresql://chatapp_user:chatapp_password@user-db:5432/chatapp_user_db}
+      RABBIT_MQ_URL: ${RABBIT_MQ_URL:-amqp://guest:guest@rabbitmq:5672}
+
+    ports:
+      - '${CHAT_SERVICE_PORT:-4002}:4002'
+
+    depends_on:
+      user-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - chatapp-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4002/health']
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
 volumes:

@@ -79,7 +79,7 @@ USER nodeuser
 
 WORKDIR /app/services/chat-service
 
-EXPOSE 4003
+EXPOSE 4002
 
 CMD ["node", "dist/index.js"]
 # CMD ["pnpm", "dev"]
