@@ -105,17 +105,6 @@ services:
       NODE_ENV: ${NODE_ENV:-development}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT:-4003}
 
-      AUTH_DB_URL: ${AUTH_DB_URL:-mysql://chatapp_auth_user:chatapp_auth_password@auth-db:3306/chatapp_auth_db}
-      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-chatapp_internal_api_token}
-
-      JWT_SECRET: ${JWT_SECRET:-chatapp_jwt_secret}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-3600}
-      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-3600}
-      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-chatapp_jwt_refresh_secret}
-
-      # Use RabbitMQ service name
-      RABBIT_MQ_URL: ${RABBIT_MQ_URL:-amqp://guest:guest@rabbitmq:5672}
-
     ports:
       - '${AUTH_SERVICE_PORT:-4003}:4003'
 
@@ -142,8 +131,6 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       CHAT_SERVICE_PORT: ${CHAT_SERVICE_PORT:-4002}
-      USER_DB_URL: ${USER_DB_URL:postgresql://chatapp_user:chatapp_password@user-db:5432/chatapp_user_db}
-      RABBIT_MQ_URL: ${RABBIT_MQ_URL:-amqp://guest:guest@rabbitmq:5672}
 
     ports:
       - '${CHAT_SERVICE_PORT:-4002}:4002'
@@ -162,6 +149,59 @@ services:
       retries: 5
       start_period: 30s
     restart: unless-stopped
+
+  user-service:
+    build:
+      context: .
+      dockerfile: services/user-service/Dockerfile
+    container_name: chatapp_user_service
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      USER_SERVICE_PORT: ${USER_SERVICE_PORT:-4001}
+
+    ports:
+      - '${USER_SERVICE_PORT:-4001}:4001'
+
+    depends_on:
+      user-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - chatapp-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4001/health']
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: services/gateway-service/Dockerfile
+    container_name: chatapp_gateway_service
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      GATEWAY_SERVICE_PORT: ${GATEWAY_SERVICE_PORT:-4000}
+    ports:
+      - '${GATEWAY_SERVICE_PORT:-4000}:4000'
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      chat-service:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+    networks:
+      - chatapp-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:4000/health']
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
 volumes:
   user-db-data:
