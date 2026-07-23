@@ -17,6 +17,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   mongo:
     image: mongo:latest
@@ -31,9 +32,10 @@ services:
     networks:
       - chatapp-network
     healthcheck:
-      test: ['CMD', 'mongo', '--eval', "db.runCommand('ping').ok"]
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
+      start_period: 30s
       retries: 5
 
   redis:
@@ -50,6 +52,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -69,6 +72,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   auth-db:
     image: mysql:8.0
@@ -94,7 +98,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-      start_period: 20s
+      start_period: 30s
 
   auth-service:
     build:
@@ -105,6 +109,16 @@ services:
       NODE_ENV: ${NODE_ENV:-development}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT:-4003}
 
+      AUTH_DB_URL: ${AUTH_DB_URL:-mysql://chatapp_auth_user:chatapp_auth_password@auth-db:3306/chatapp_auth_db}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-chatapp_internal_api_token}
+
+      JWT_SECRET: ${JWT_SECRET:-chatapp_jwt_secret}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-3600}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-3600}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-chatapp_jwt_refresh_secret}
+
+      RABBIT_MQ_URL: ${RABBIT_MQ_URL:-amqp://guest:guest@rabbitmq:5672}
+
     ports:
       - '${AUTH_SERVICE_PORT:-4003}:4003'
 
@@ -113,42 +127,21 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:4003/auth/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     networks:
       - chatapp-network
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:4003/health']
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
-    restart: unless-stopped
-
-  chat-service:
-    build:
-      context: .
-      dockerfile: services/chat-service/Dockerfile
-    container_name: chatapp_chat_service
-    environment:
-      NODE_ENV: ${NODE_ENV:-development}
-      CHAT_SERVICE_PORT: ${CHAT_SERVICE_PORT:-4002}
-
-    ports:
-      - '${CHAT_SERVICE_PORT:-4002}:4002'
-
-    depends_on:
-      user-db:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    networks:
-      - chatapp-network
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:4002/health']
-      interval: 1m30s
-      timeout: 30s
-      retries: 5
-      start_period: 30s
-    restart: unless-stopped
+    restart: no
 
   user-service:
     build:
@@ -156,8 +149,14 @@ services:
       dockerfile: services/user-service/Dockerfile
     container_name: chatapp_user_service
     environment:
+      # service
       NODE_ENV: ${NODE_ENV:-development}
       USER_SERVICE_PORT: ${USER_SERVICE_PORT:-4001}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-secret}
+
+      # database
+      RABBIT_MQ_URL: ${RABBIT_MQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      USER_DB_URL: ${USER_DB_URL:-mysql://chatapp_user:chatapp_password@user-db:3306/chatapp_user_db}
 
     ports:
       - '${USER_SERVICE_PORT:-4001}:4001'
@@ -167,14 +166,66 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+
     networks:
       - chatapp-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:4001/health']
-      interval: 1m30s
-      timeout: 30s
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:4001/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 15s
+    restart: unless-stopped
+
+  chat-service:
+    build:
+      context: .
+      dockerfile: services/chat-service/Dockerfile
+    container_name: chatapp_chat_service
+    environment:
+      # service
+      NODE_ENV: ${NODE_ENV:-development}
+      CHAT_SERVICE_PORT: ${CHAT_SERVICE_PORT:-4002}
+
+      # database
+      MONGO_URL: ${MONGO_URL:-mongodb://chatapp_mongo:chatapp_password@mongo:27017/chatapp_chat_db?authSource=admin}
+      RABBIT_MQ_URL: ${RABBIT_MQ_URL:-amqp://guest:guest@rabbitmq:5672/}
+      REDIS_URL: ${REDIS_URL:-redis://localhost:6379}
+
+      # auth
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-secret}
+      JWT_SECRET: ${JWT_SECRET:-secret}
+
+    ports:
+      - '${CHAT_SERVICE_PORT:-4002}:4002'
+
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_started
+    networks:
+      - chatapp-network
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:4002/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     restart: unless-stopped
 
   gateway-service:
@@ -184,7 +235,16 @@ services:
     container_name: chatapp_gateway_service
     environment:
       NODE_ENV: ${NODE_ENV:-development}
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN:-secret}
+      # port
       GATEWAY_SERVICE_PORT: ${GATEWAY_SERVICE_PORT:-4000}
+      # jwt
+      JWT_SECRET: ${JWT_SECRET:-secret}
+      # urls
+      USER_SERVICE_URL: ${USER_SERVICE_URL:-http://localhost:4001}
+      CHAT_SERVICE_URL: ${CHAT_SERVICE_URL:-http://localhost:4002}
+      AUTH_SERVICE_URL: ${AUTH_SERVICE_URL:-http://localhost:4003}
+
     ports:
       - '${GATEWAY_SERVICE_PORT:-4000}:4000'
     depends_on:
@@ -197,11 +257,18 @@ services:
     networks:
       - chatapp-network
     healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:4000/health']
-      interval: 1m30s
-      timeout: 30s
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:4000/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
+      interval: 10s
+      timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 15s
+    restart: unless-stopped
 
 volumes:
   user-db-data:
